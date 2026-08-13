@@ -309,6 +309,7 @@ interface ApiTimelineEntry {
 }
 
 export interface TrendPoint {
+   assessmentId: string;
   date: string;
   presentCount: number;
   totalBehaviours: number;
@@ -329,11 +330,12 @@ export async function getCommunicationProfile(
   return {
     patient: patientFromApi(data.patient),
     approvedAssessments: data.approved_assessments.map(assessmentFromApi),
-    trend: data.trend.map((t) => ({
-      date: t.assessment_date,
-      presentCount: t.present_count,
-      totalBehaviours: t.total_behaviours,
-    })),
+  trend: data.trend.map((t) => ({
+  assessmentId: t.assessment_id,
+  date: t.assessment_date,
+  presentCount: t.present_count,
+  totalBehaviours: t.total_behaviours,
+})),
   };
 }
 
