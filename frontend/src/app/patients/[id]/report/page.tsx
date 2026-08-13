@@ -11,6 +11,7 @@ import {
   getReportById,
   updateReport,
   approveReport,
+  downloadReportPdf,
 } from "@/lib/api";
 import { useSearchParams } from "next/navigation";
 
@@ -63,7 +64,7 @@ if (reportId) {
     reportData = await generateReport({
       assessment_id: assessmentId,
       patient_id: id,
-      therapist_id: "4b3ef53f-b585-4652-adb7-0e6fa7a2ac5d",
+     
     });
   }
 }
@@ -146,6 +147,25 @@ async function handleApprove() {
       err instanceof Error
         ? err.message
         : JSON.stringify(err)
+    );
+  }
+}
+async function handleDownloadPdf() {
+  if (!report) return;
+
+  try {
+    const blob = await downloadReportPdf(report.id);
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "CAT_Report.pdf";
+    link.click();
+
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    setError(
+      err instanceof Error ? err.message : "Could not download the PDF."
     );
   }
 }
@@ -294,14 +314,12 @@ async function handleApprove() {
   ? "Approved ✓"
   : "Approve Report"}
         </button>
-        <a
-  href={`http://127.0.0.1:8000/reports/${report.id}/pdf`}
-  target="_blank"
-  rel="noopener noreferrer"
+       <button
+  onClick={handleDownloadPdf}
   className="bg-slate-700 text-white text-sm font-medium px-5 py-2.5 rounded-md hover:bg-slate-800"
 >
   Download PDF
-</a>
+</button>
         <p className="text-sm text-slate-500">
           Therapist approval is mandatory — this button is the only way a
           report gets saved.

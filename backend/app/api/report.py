@@ -33,6 +33,11 @@ def generate_report(
     assessment = assessment_service.get_assessment(report.assessment_id)
     if not assessment:
         raise HTTPException(status_code=404, detail="Assessment not found")
+    if assessment["patient_id"] != report.patient_id:
+        raise HTTPException(
+        status_code=400,
+        detail="This assessment does not belong to the selected patient",
+    )
 
     ai_request = AIReportRequest(
         patient_name=patient["full_name"],

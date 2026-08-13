@@ -402,7 +402,6 @@ export async function getParentDashboard() {
 export async function generateReport(data: {
   assessment_id: string;
   patient_id: string;
-  therapist_id: string;
 }) {
   return request<Report>("/reports/generate", {
     method: "POST",
@@ -434,4 +433,20 @@ export async function approveReport(reportId: string) {
   return request<Report>(`/reports/${reportId}/approve`, {
     method: "PATCH",
   });
+}
+
+export async function downloadReportPdf(reportId: string): Promise<Blob> {
+  const authHeaders = await getAuthHeaders();
+
+  const response = await fetch(
+`${API_BASE_URL}/reports/${reportId}/pdf`,    {
+      headers: authHeaders,
+    }
+  );
+
+  if (!response.ok) {
+    throw new ApiError("Could not download the PDF report.", response.status);
+  }
+
+  return response.blob();
 }
