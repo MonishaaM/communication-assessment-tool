@@ -14,7 +14,7 @@ def create_new_assessment(
     user: CurrentUser = Depends(require_therapist),
 ):
     ensure_patient_access(assessment.patient_id, user)
-    return assessment_service.create_assessment(assessment)
+    return assessment_service.create_assessment(assessment,user.profile_id)
 
 
 @router.get("/assessments/{assessment_id}")

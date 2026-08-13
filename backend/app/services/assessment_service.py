@@ -1,11 +1,10 @@
 from app.database.supabase import supabase
 from app.schemas.assessment import AssessmentCreate
 
-
-def create_assessment(assessment: AssessmentCreate):
+def create_assessment(assessment: AssessmentCreate, therapist_id: str):
     assessment_payload = {
         "patient_id": assessment.patient_id,
-        "therapist_id": assessment.therapist_id,
+        "therapist_id": therapist_id,
         "assessment_date": assessment.assessment_date.isoformat(),
         "status": "draft",
     }

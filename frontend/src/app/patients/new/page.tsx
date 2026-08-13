@@ -7,7 +7,7 @@ import { createPatient } from "@/lib/api";
 // the therapist who manages them, and this links to the same therapist_id
 // used when inviting a parent for that patient. Using a placeholder until
 // real login exists. Must match a real row in the therapists table.
-const PLACEHOLDER_THERAPIST_ID = "4b3ef53f-b585-4652-adb7-0e6fa7a2ac5d";
+
 
 export default function AddPatientPage() {
   const router = useRouter();
@@ -32,7 +32,7 @@ export default function AddPatientPage() {
         caregiverContact,
         gender: gender || undefined,
         diagnosis: diagnosis || undefined,
-        therapistId: PLACEHOLDER_THERAPIST_ID,
+        
       });
       router.push("/patients");
     } catch (err) {

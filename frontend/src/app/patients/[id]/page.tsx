@@ -67,7 +67,7 @@ export default function PatientPage({
         email: parentEmail,
         phone: parentPhone,
         patient_id: patient.id,
-        invited_by: "4b3ef53f-b585-4652-adb7-0e6fa7a2ac5d",
+     
       });
 
       alert("Parent invited successfully!");

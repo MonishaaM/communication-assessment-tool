@@ -10,7 +10,7 @@ class PatientCreate(BaseModel):
     caregiver_phone: str = Field(..., min_length=1)
     gender: Optional[str] = None
     diagnosis: Optional[str] = None
-    therapist_id: str  # required — every patient belongs to a therapist; see frontend PLACEHOLDER_THERAPIST_ID until real login exists# TODO: derive from auth once login exists
+      # required — every patient belongs to a therapist; see frontend PLACEHOLDER_THERAPIST_ID until real login exists# TODO: derive from auth once login exists
 
 
 class PatientUpdate(BaseModel):

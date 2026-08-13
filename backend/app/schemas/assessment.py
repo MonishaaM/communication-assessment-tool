@@ -18,7 +18,7 @@ class BehaviourScoreOut(BehaviourScoreIn):
 
 class AssessmentCreate(BaseModel):
     patient_id: str
-    therapist_id: str  # required — DB enforces NOT NULL + foreign key
+      # required — DB enforces NOT NULL + foreign key
     assessment_date: date
     scores: List[BehaviourScoreIn] = Field(..., min_length=10, max_length=10)
 
@@ -26,7 +26,7 @@ class AssessmentCreate(BaseModel):
 class AssessmentOut(BaseModel):
     id: str
     patient_id: str
-    therapist_id: str
+    
     assessment_date: str
     status: str
     scores: List[BehaviourScoreOut] = []

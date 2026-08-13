@@ -28,7 +28,7 @@ interface ApiPatientCreate {
   caregiver_phone: string;
   gender?: string;
   diagnosis?: string;
-  therapist_id?: string;
+ 
 }
 
 type ApiBehaviourStatus = "Present" | "Absent";
@@ -46,7 +46,7 @@ interface ApiBehaviourScoreOut extends ApiBehaviourScoreIn {
 
 interface ApiAssessmentCreate {
   patient_id: string;
-  therapist_id: string;
+ 
   assessment_date: string;
   scores: ApiBehaviourScoreIn[];
 }
@@ -85,14 +85,14 @@ function patientToApiCreate(input: {
   caregiverContact: string;
   gender?: string;
   diagnosis?: string;
-  therapistId: string;
+  
 }): ApiPatientCreate {
   return {
     full_name: input.name,
     date_of_birth: input.dateOfBirth,
     caregiver_name: input.caregiverName,
     caregiver_phone: input.caregiverContact,
-    therapist_id: input.therapistId,
+    
     ...(input.gender ? { gender: input.gender } : {}),
     ...(input.diagnosis ? { diagnosis: input.diagnosis } : {}),
   };
@@ -205,7 +205,7 @@ export async function createPatient(input: {
   caregiverContact: string;
   gender?: string;
   diagnosis?: string;
-  therapistId: string;
+ 
 }): Promise<Patient> {
   const data = await request<ApiPatient>("/patients/", {
     method: "POST",
@@ -250,13 +250,13 @@ export async function deletePatient(id: string): Promise<void> {
 
 export async function createAssessment(input: {
   patientId: string;
-  therapistId: string; // required by backend; no auth yet — see report
+  // required by backend; no auth yet — see report
   assessmentDate: string; // YYYY-MM-DD
   scores: BehaviourScore[]; // all 10 must be "present" or "absent"
 }): Promise<Assessment> {
   const payload: ApiAssessmentCreate = {
     patient_id: input.patientId,
-    therapist_id: input.therapistId,
+   
     assessment_date: input.assessmentDate,
     scores: input.scores.map((s) => ({
       behaviour_name: s.behaviour,
@@ -359,7 +359,7 @@ export async function inviteParent(data: {
   email: string;
   phone: string;
   patient_id: string;
-  invited_by: string;
+  
 }) {
   return request<{ message: string; temporary_password: string; parent: unknown }>(
     "/parents/",
