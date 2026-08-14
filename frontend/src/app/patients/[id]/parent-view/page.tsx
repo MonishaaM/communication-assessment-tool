@@ -2,10 +2,15 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
-import { getPatient, getPatientAssessments, getReport,getCommunicationProfile,CommunicationProfile } from "@/lib/api";
+import { getPatient,
+   getPatientAssessments,
+   getAssessment,
+    getReport,
+    getCommunicationProfile,
+    CommunicationProfile } from "@/lib/api";
 import { Patient, Assessment } from "@/types";
 
-const teachingVideos = [
+const activityCatalog = [
   {
     title: "Eye Contact Practice",
     behaviour: "Eye Contact",
@@ -40,13 +45,22 @@ export default function ParentViewPage({
   const { id } = use(params);
 
   const [patient, setPatient] = useState<Patient | null>(null);
+  
   const [latestAssessment, setLatestAssessment] =
     useState<Assessment | null>(null);
   const [report, setReport] = useState<ParentReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [profile, setProfile] = useState<CommunicationProfile | null>(null);
+  const recommendedActivities = latestAssessment
+  ? activityCatalog.filter((activity) => {
+      const score = latestAssessment.scores.find(
+        (s) => s.behaviour === activity.behaviour
+      );
 
+      return score?.result === "absent";
+    })
+  : [];
   useEffect(() => {
     async function load() {
       try {
@@ -66,12 +80,12 @@ export default function ParentViewPage({
         if (approved.length === 0) {
           return;
         }
+const latest = approved[0];
 
-        const latest = approved[0];
-        setLatestAssessment(latest);
-        
+const latestWithScores = await getAssessment(latest.id);
+setLatestAssessment(latestWithScores);
 
-        const reportData = await getReport(latest.id);
+const reportData = await getReport(latest.id);
 
         if (reportData?.status === "approved") {
           setReport(reportData);
@@ -91,7 +105,6 @@ export default function ParentViewPage({
   }, [id]);
 
   if (loading) {
-    console.log("Parent profile trend:", profile?.trend);
     return (
       <div className="max-w-4xl mx-auto p-6">
         <p className="text-slate-500">Loading parent view...</p>
@@ -367,45 +380,70 @@ export default function ParentViewPage({
           </div>
 
           <div className="mt-6 bg-white border border-slate-200 rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-slate-900">
-              Teaching Activities
-            </h2>
+  <h2 className="text-lg font-semibold text-slate-900">
+    Therapist Recommendations
+  </h2>
 
-            <div className="space-y-3 mt-4">
-              {teachingVideos.map((video) => (
-                <div
-                  key={video.title}
-                  className="border border-slate-200 rounded-lg p-4 flex items-center justify-between"
-                >
-                  <div>
-                    <p className="font-medium text-slate-900">
-                      {video.title}
-                    </p>
-                    <p className="text-sm text-slate-500 mt-1">
-                      Focus: {video.behaviour}
-                    </p>
-                  </div>
+  <p className="text-sm leading-6 text-slate-700 mt-3 whitespace-pre-line">
+    {report.recommendations ||
+      "No home activities have been added yet."}
+  </p>
+</div>
 
-                  <a
-                    href={video.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-blue-600 text-white text-sm px-4 py-2 rounded-md hover:bg-blue-700"
-                  >
-                    Watch
-                  </a>
-                </div>
-              ))}
-            </div>
-          </div>
+<div className="mt-6 bg-white border border-slate-200 rounded-xl p-6">
+  <h2 className="text-lg font-semibold text-slate-900">
+    Recommended Practice Activities
+  </h2>
 
-          <div className="mt-6 bg-blue-50 border border-blue-100 rounded-xl p-5">
-            <p className="text-sm text-blue-900">
-              This preview shows the information that is appropriate for the
-              caregiver. Internal therapist notes and draft reports are not
-              displayed.
+  <p className="text-sm text-slate-500 mt-1">
+    Activities selected from the latest approved assessment.
+  </p>
+
+  {recommendedActivities.length === 0 ? (
+    <div className="mt-4 bg-emerald-50 border border-emerald-100 rounded-lg p-4">
+      <p className="text-sm text-emerald-800">
+        No specific practice activities are recommended right now.
+        Continue with your therapist&apos;s general communication activities.
+      </p>
+    </div>
+  ) : (
+    <div className="space-y-3 mt-4">
+      {recommendedActivities.map((activity) => (
+        <div
+          key={activity.behaviour}
+          className="border border-slate-200 rounded-lg p-4 flex items-center justify-between"
+        >
+          <div>
+            <p className="font-medium text-slate-900">
+              {activity.title}
+            </p>
+
+            <p className="text-sm text-slate-500 mt-1">
+              Focus: {activity.behaviour}
             </p>
           </div>
+
+          <a
+            href={activity.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-blue-600 text-white text-sm px-4 py-2 rounded-md hover:bg-blue-700"
+          >
+            Watch
+          </a>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+<div className="mt-6 bg-blue-50 border border-blue-100 rounded-xl p-5">
+  <p className="text-sm text-blue-900">
+    This preview shows the information that is appropriate for the
+    caregiver. Internal therapist notes and draft reports are not
+    displayed.
+  </p>
+</div>
         </>
       )}
     </div>
