@@ -391,13 +391,15 @@ export interface ParentDashboard {
 export async function getParentDashboard() {
     return request<ParentDashboard>(`/parents/dashboard`);
   }
-  export interface Report {
+ export interface Report {
   id: string;
   assessment_id: string;
   patient_id: string;
   therapist_id: string;
   ai_report: string;
   therapist_report: string;
+  recommendations: string;
+  parent_summary: string;
   status: string;
 }
 
@@ -411,7 +413,15 @@ export async function generateReport(data: {
   });
 }
 export async function getReport(assessmentId: string) {
-  return request<any>(`/reports/${assessmentId}`);
+  try {
+    return await request<Report>(`/reports/${assessmentId}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) {
+      return null;
+    }
+
+    throw err;
+  }
 }
 export async function getReportById(reportId: string) {
   return request<Report>(`/reports/id/${reportId}`);

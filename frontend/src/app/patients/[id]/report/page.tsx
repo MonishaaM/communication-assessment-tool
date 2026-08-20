@@ -52,19 +52,17 @@ const reportId = searchParams.get("report");
 if (!assessmentId) {
   throw new Error("Assessment not found");
 }
-
 let reportData;
 
 if (reportId) {
   reportData = await getReportById(reportId);
 } else {
-  try {
-    reportData = await getReport(assessmentId);
-  } catch {
+  reportData = await getReport(assessmentId);
+
+  if (!reportData) {
     reportData = await generateReport({
       assessment_id: assessmentId,
       patient_id: id,
-     
     });
   }
 }
@@ -115,6 +113,24 @@ const currentScores: BehaviourScore[] = raw
     }
     load();
   }, [id]);
+
+  async function handleSaveDraft() {
+  if (!report) return;
+
+  try {
+    const updated = await updateReport(report.id, {
+      therapist_report: report.therapist_report,
+      recommendations: report.recommendations,
+      parent_summary: report.parent_summary,
+    });
+
+    setReport(updated);
+  } catch (err) {
+    setError(
+      err instanceof Error ? err.message : "Could not save the draft."
+    );
+  }
+}
 
 async function handleApprove() {
   if (!report) return;
@@ -217,8 +233,8 @@ async function handleDownloadPdf() {
 </span>
       </div>
       <p className="text-slate-500 mt-1">
-        Review and edit before approving. Nothing is saved until you approve.
-      </p>
+Review and edit the AI-generated draft. You can save changes as a draft
+or approve the report when it is ready.      </p>
 
       {previousAssessment && diffRows.length > 0 && (
         <div className="mt-6 bg-white border border-slate-200 rounded-lg p-5">
@@ -321,8 +337,7 @@ async function handleDownloadPdf() {
   Download PDF
 </button>
         <p className="text-sm text-slate-500">
-          Therapist approval is mandatory — this button is the only way a
-          report gets saved.
+          Review the draft carefully before approving it for caregiver use.
         </p>
       </div>
     </div>
